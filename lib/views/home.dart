@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:prac_ef/views/favorite_book.dart';
+import 'package:prac_ef/views/find_book.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -27,7 +29,7 @@ class Home extends StatelessWidget {
                 child:
                 OutlinedButton(
                     onPressed: (){
-                      Navigator.pushNamed(context, '/search');
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => FindBook()));
                     },
                     child:
                     Text("Find Book",
@@ -44,7 +46,7 @@ class Home extends StatelessWidget {
               child:
               OutlinedButton(
                   onPressed: (){
-                    Navigator.pushNamed(context, '/search');
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => FavoriteBook()));
                   },
                   child:
                   Text("Favorite Book",

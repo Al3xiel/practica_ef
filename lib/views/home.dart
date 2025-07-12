@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:prac_ef/views/favorite_book.dart';
-import 'package:prac_ef/views/find_book.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/book_bloc.dart';
+import '../service/book_service.dart';
+import 'favorite_book.dart';
+import 'find_book.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -29,7 +32,15 @@ class Home extends StatelessWidget {
                 child:
                 OutlinedButton(
                     onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => FindBook()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                            create: (context) => BookBloc(bookService: BookService()),
+                            child: FindBook(),
+                          ),
+                        ),
+                      );
                     },
                     child:
                     Text("Find Book",

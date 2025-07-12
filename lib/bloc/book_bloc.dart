@@ -19,7 +19,13 @@ class BookBloc extends Bloc<BookEvent, BookState>{
     emit(BookLoading());
     try {
       final books = await bookService.getBooks();
-      emit(BookLoaded(books));
+      List<JsonBook> filteredBooks = books;
+      if (event.contentFilter != null && event.contentFilter!.isNotEmpty) {
+        filteredBooks = books.where((book) =>
+          (book.content ?? '').toLowerCase().contains(event.contentFilter!.toLowerCase())
+        ).toList();
+      }
+      emit(BookLoaded(filteredBooks));
     } catch (e) {
       emit(BookError(e.toString()));
     }

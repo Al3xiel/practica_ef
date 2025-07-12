@@ -9,10 +9,12 @@ part 'database.g.dart';
 
 class Books extends Table{
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get title => text().withLength(min: 1, max: 100)();
-  TextColumn get author => text().withLength(min: 1, max: 100)();
-  TextColumn get description => text().nullable()();
-  BoolColumn get isFavorite => boolean().withDefault(Constant(false))();
+  TextColumn get title => text().nullable()();
+  TextColumn get author => text().nullable()();
+  TextColumn get content => text().nullable()();
+  TextColumn get url => text().nullable()();
+  TextColumn get urlToImage => text().nullable()();
+  TextColumn get publishedAt => text().nullable()();
 }
 
 LazyDatabase openConnection() {

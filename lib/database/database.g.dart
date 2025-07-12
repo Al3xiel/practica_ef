@@ -9,53 +9,81 @@ part of 'database.dart';
 // ignore_for_file: type=lint
 class Book extends DataClass implements Insertable<Book> {
   final int id;
-  final String title;
-  final String author;
-  final String? description;
-  final bool isFavorite;
+  final String? title;
+  final String? author;
+  final String? content;
+  final String? url;
+  final String? urlToImage;
+  final String? publishedAt;
   Book(
       {required this.id,
-      required this.title,
-      required this.author,
-      this.description,
-      required this.isFavorite});
+      this.title,
+      this.author,
+      this.content,
+      this.url,
+      this.urlToImage,
+      this.publishedAt});
   factory Book.fromData(Map<String, dynamic> data, {String? prefix}) {
     final effectivePrefix = prefix ?? '';
     return Book(
       id: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       title: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}title'])!,
+          .mapFromDatabaseResponse(data['${effectivePrefix}title']),
       author: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}author'])!,
-      description: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
-      isFavorite: const BoolType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}is_favorite'])!,
+          .mapFromDatabaseResponse(data['${effectivePrefix}author']),
+      content: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}content']),
+      url: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}url']),
+      urlToImage: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}url_to_image']),
+      publishedAt: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}published_at']),
     );
   }
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['title'] = Variable<String>(title);
-    map['author'] = Variable<String>(author);
-    if (!nullToAbsent || description != null) {
-      map['description'] = Variable<String?>(description);
+    if (!nullToAbsent || title != null) {
+      map['title'] = Variable<String?>(title);
     }
-    map['is_favorite'] = Variable<bool>(isFavorite);
+    if (!nullToAbsent || author != null) {
+      map['author'] = Variable<String?>(author);
+    }
+    if (!nullToAbsent || content != null) {
+      map['content'] = Variable<String?>(content);
+    }
+    if (!nullToAbsent || url != null) {
+      map['url'] = Variable<String?>(url);
+    }
+    if (!nullToAbsent || urlToImage != null) {
+      map['url_to_image'] = Variable<String?>(urlToImage);
+    }
+    if (!nullToAbsent || publishedAt != null) {
+      map['published_at'] = Variable<String?>(publishedAt);
+    }
     return map;
   }
 
   BooksCompanion toCompanion(bool nullToAbsent) {
     return BooksCompanion(
       id: Value(id),
-      title: Value(title),
-      author: Value(author),
-      description: description == null && nullToAbsent
+      title:
+          title == null && nullToAbsent ? const Value.absent() : Value(title),
+      author:
+          author == null && nullToAbsent ? const Value.absent() : Value(author),
+      content: content == null && nullToAbsent
           ? const Value.absent()
-          : Value(description),
-      isFavorite: Value(isFavorite),
+          : Value(content),
+      url: url == null && nullToAbsent ? const Value.absent() : Value(url),
+      urlToImage: urlToImage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(urlToImage),
+      publishedAt: publishedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(publishedAt),
     );
   }
 
@@ -64,10 +92,12 @@ class Book extends DataClass implements Insertable<Book> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Book(
       id: serializer.fromJson<int>(json['id']),
-      title: serializer.fromJson<String>(json['title']),
-      author: serializer.fromJson<String>(json['author']),
-      description: serializer.fromJson<String?>(json['description']),
-      isFavorite: serializer.fromJson<bool>(json['isFavorite']),
+      title: serializer.fromJson<String?>(json['title']),
+      author: serializer.fromJson<String?>(json['author']),
+      content: serializer.fromJson<String?>(json['content']),
+      url: serializer.fromJson<String?>(json['url']),
+      urlToImage: serializer.fromJson<String?>(json['urlToImage']),
+      publishedAt: serializer.fromJson<String?>(json['publishedAt']),
     );
   }
   @override
@@ -75,10 +105,12 @@ class Book extends DataClass implements Insertable<Book> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'title': serializer.toJson<String>(title),
-      'author': serializer.toJson<String>(author),
-      'description': serializer.toJson<String?>(description),
-      'isFavorite': serializer.toJson<bool>(isFavorite),
+      'title': serializer.toJson<String?>(title),
+      'author': serializer.toJson<String?>(author),
+      'content': serializer.toJson<String?>(content),
+      'url': serializer.toJson<String?>(url),
+      'urlToImage': serializer.toJson<String?>(urlToImage),
+      'publishedAt': serializer.toJson<String?>(publishedAt),
     };
   }
 
@@ -86,14 +118,18 @@ class Book extends DataClass implements Insertable<Book> {
           {int? id,
           String? title,
           String? author,
-          String? description,
-          bool? isFavorite}) =>
+          String? content,
+          String? url,
+          String? urlToImage,
+          String? publishedAt}) =>
       Book(
         id: id ?? this.id,
         title: title ?? this.title,
         author: author ?? this.author,
-        description: description ?? this.description,
-        isFavorite: isFavorite ?? this.isFavorite,
+        content: content ?? this.content,
+        url: url ?? this.url,
+        urlToImage: urlToImage ?? this.urlToImage,
+        publishedAt: publishedAt ?? this.publishedAt,
       );
   @override
   String toString() {
@@ -101,14 +137,17 @@ class Book extends DataClass implements Insertable<Book> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('author: $author, ')
-          ..write('description: $description, ')
-          ..write('isFavorite: $isFavorite')
+          ..write('content: $content, ')
+          ..write('url: $url, ')
+          ..write('urlToImage: $urlToImage, ')
+          ..write('publishedAt: $publishedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, author, description, isFavorite);
+  int get hashCode =>
+      Object.hash(id, title, author, content, url, urlToImage, publishedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -116,59 +155,74 @@ class Book extends DataClass implements Insertable<Book> {
           other.id == this.id &&
           other.title == this.title &&
           other.author == this.author &&
-          other.description == this.description &&
-          other.isFavorite == this.isFavorite);
+          other.content == this.content &&
+          other.url == this.url &&
+          other.urlToImage == this.urlToImage &&
+          other.publishedAt == this.publishedAt);
 }
 
 class BooksCompanion extends UpdateCompanion<Book> {
   final Value<int> id;
-  final Value<String> title;
-  final Value<String> author;
-  final Value<String?> description;
-  final Value<bool> isFavorite;
+  final Value<String?> title;
+  final Value<String?> author;
+  final Value<String?> content;
+  final Value<String?> url;
+  final Value<String?> urlToImage;
+  final Value<String?> publishedAt;
   const BooksCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.author = const Value.absent(),
-    this.description = const Value.absent(),
-    this.isFavorite = const Value.absent(),
+    this.content = const Value.absent(),
+    this.url = const Value.absent(),
+    this.urlToImage = const Value.absent(),
+    this.publishedAt = const Value.absent(),
   });
   BooksCompanion.insert({
     this.id = const Value.absent(),
-    required String title,
-    required String author,
-    this.description = const Value.absent(),
-    this.isFavorite = const Value.absent(),
-  })  : title = Value(title),
-        author = Value(author);
+    this.title = const Value.absent(),
+    this.author = const Value.absent(),
+    this.content = const Value.absent(),
+    this.url = const Value.absent(),
+    this.urlToImage = const Value.absent(),
+    this.publishedAt = const Value.absent(),
+  });
   static Insertable<Book> custom({
     Expression<int>? id,
-    Expression<String>? title,
-    Expression<String>? author,
-    Expression<String?>? description,
-    Expression<bool>? isFavorite,
+    Expression<String?>? title,
+    Expression<String?>? author,
+    Expression<String?>? content,
+    Expression<String?>? url,
+    Expression<String?>? urlToImage,
+    Expression<String?>? publishedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (author != null) 'author': author,
-      if (description != null) 'description': description,
-      if (isFavorite != null) 'is_favorite': isFavorite,
+      if (content != null) 'content': content,
+      if (url != null) 'url': url,
+      if (urlToImage != null) 'url_to_image': urlToImage,
+      if (publishedAt != null) 'published_at': publishedAt,
     });
   }
 
   BooksCompanion copyWith(
       {Value<int>? id,
-      Value<String>? title,
-      Value<String>? author,
-      Value<String?>? description,
-      Value<bool>? isFavorite}) {
+      Value<String?>? title,
+      Value<String?>? author,
+      Value<String?>? content,
+      Value<String?>? url,
+      Value<String?>? urlToImage,
+      Value<String?>? publishedAt}) {
     return BooksCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
       author: author ?? this.author,
-      description: description ?? this.description,
-      isFavorite: isFavorite ?? this.isFavorite,
+      content: content ?? this.content,
+      url: url ?? this.url,
+      urlToImage: urlToImage ?? this.urlToImage,
+      publishedAt: publishedAt ?? this.publishedAt,
     );
   }
 
@@ -179,16 +233,22 @@ class BooksCompanion extends UpdateCompanion<Book> {
       map['id'] = Variable<int>(id.value);
     }
     if (title.present) {
-      map['title'] = Variable<String>(title.value);
+      map['title'] = Variable<String?>(title.value);
     }
     if (author.present) {
-      map['author'] = Variable<String>(author.value);
+      map['author'] = Variable<String?>(author.value);
     }
-    if (description.present) {
-      map['description'] = Variable<String?>(description.value);
+    if (content.present) {
+      map['content'] = Variable<String?>(content.value);
     }
-    if (isFavorite.present) {
-      map['is_favorite'] = Variable<bool>(isFavorite.value);
+    if (url.present) {
+      map['url'] = Variable<String?>(url.value);
+    }
+    if (urlToImage.present) {
+      map['url_to_image'] = Variable<String?>(urlToImage.value);
+    }
+    if (publishedAt.present) {
+      map['published_at'] = Variable<String?>(publishedAt.value);
     }
     return map;
   }
@@ -199,8 +259,10 @@ class BooksCompanion extends UpdateCompanion<Book> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('author: $author, ')
-          ..write('description: $description, ')
-          ..write('isFavorite: $isFavorite')
+          ..write('content: $content, ')
+          ..write('url: $url, ')
+          ..write('urlToImage: $urlToImage, ')
+          ..write('publishedAt: $publishedAt')
           ..write(')'))
         .toString();
   }
@@ -221,36 +283,37 @@ class $BooksTable extends Books with TableInfo<$BooksTable, Book> {
   final VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String?> title = GeneratedColumn<String?>(
-      'title', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
-      type: const StringType(),
-      requiredDuringInsert: true);
+      'title', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
   final VerificationMeta _authorMeta = const VerificationMeta('author');
   @override
   late final GeneratedColumn<String?> author = GeneratedColumn<String?>(
-      'author', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
-      type: const StringType(),
-      requiredDuringInsert: true);
-  final VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
-  @override
-  late final GeneratedColumn<String?> description = GeneratedColumn<String?>(
-      'description', aliasedName, true,
+      'author', aliasedName, true,
       type: const StringType(), requiredDuringInsert: false);
-  final VerificationMeta _isFavoriteMeta = const VerificationMeta('isFavorite');
+  final VerificationMeta _contentMeta = const VerificationMeta('content');
   @override
-  late final GeneratedColumn<bool?> isFavorite = GeneratedColumn<bool?>(
-      'is_favorite', aliasedName, false,
-      type: const BoolType(),
-      requiredDuringInsert: false,
-      defaultConstraints: 'CHECK (is_favorite IN (0, 1))',
-      defaultValue: Constant(false));
+  late final GeneratedColumn<String?> content = GeneratedColumn<String?>(
+      'content', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
+  final VerificationMeta _urlMeta = const VerificationMeta('url');
+  @override
+  late final GeneratedColumn<String?> url = GeneratedColumn<String?>(
+      'url', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
+  final VerificationMeta _urlToImageMeta = const VerificationMeta('urlToImage');
+  @override
+  late final GeneratedColumn<String?> urlToImage = GeneratedColumn<String?>(
+      'url_to_image', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
+  final VerificationMeta _publishedAtMeta =
+      const VerificationMeta('publishedAt');
+  @override
+  late final GeneratedColumn<String?> publishedAt = GeneratedColumn<String?>(
+      'published_at', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, title, author, description, isFavorite];
+      [id, title, author, content, url, urlToImage, publishedAt];
   @override
   String get aliasedName => _alias ?? 'books';
   @override
@@ -266,26 +329,30 @@ class $BooksTable extends Books with TableInfo<$BooksTable, Book> {
     if (data.containsKey('title')) {
       context.handle(
           _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
-    } else if (isInserting) {
-      context.missing(_titleMeta);
     }
     if (data.containsKey('author')) {
       context.handle(_authorMeta,
           author.isAcceptableOrUnknown(data['author']!, _authorMeta));
-    } else if (isInserting) {
-      context.missing(_authorMeta);
     }
-    if (data.containsKey('description')) {
-      context.handle(
-          _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
+    if (data.containsKey('content')) {
+      context.handle(_contentMeta,
+          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
     }
-    if (data.containsKey('is_favorite')) {
+    if (data.containsKey('url')) {
       context.handle(
-          _isFavoriteMeta,
-          isFavorite.isAcceptableOrUnknown(
-              data['is_favorite']!, _isFavoriteMeta));
+          _urlMeta, url.isAcceptableOrUnknown(data['url']!, _urlMeta));
+    }
+    if (data.containsKey('url_to_image')) {
+      context.handle(
+          _urlToImageMeta,
+          urlToImage.isAcceptableOrUnknown(
+              data['url_to_image']!, _urlToImageMeta));
+    }
+    if (data.containsKey('published_at')) {
+      context.handle(
+          _publishedAtMeta,
+          publishedAt.isAcceptableOrUnknown(
+              data['published_at']!, _publishedAtMeta));
     }
     return context;
   }

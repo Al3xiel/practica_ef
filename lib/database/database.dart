@@ -34,6 +34,14 @@ class AppDatabase extends _$AppDatabase {
 
 
   Future<int> insertBook(BooksCompanion bookCompanion) async {
+    // Check if the book already exists
+    final existingBooks = await (select(books)
+      ..where((tbl) => tbl.title.equals(bookCompanion.title.value)))
+        .get();
+    if (existingBooks.isNotEmpty) {
+      // If the book already exists, return the existing book's ID
+      return -1;
+    }
     return await into(books).insert(bookCompanion);
   }
 
